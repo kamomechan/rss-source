@@ -8,7 +8,7 @@ module.exports = async (ctx) => {
 	const baseUrl = 'https://vndb.org';
 
 	// 注意，".data" 属性包含了请求返回的目标页面的完整 HTML 源代码
-    const { data: response } = await got(`${baseUrl}/r?q=&o=d&s=released&f=06741032hen2xzh_dHans-2xzh_dHant-N483gjaNg01bgin2gja`);
+    const { data: response } = await got(`${baseUrl}/r?q=&o=d&s=released&f=04741132gen2wzh_dHans-2wzh_dHant-Ng01bgin`);
     const $ = cheerio.load(response);
 
 
@@ -26,6 +26,33 @@ module.exports = async (ctx) => {
             const inter = item.find('.tc_links a');
 			//获取.tc4类下第二个标签，注:(patch)(unofficial patch)(drm-free)(drm)
 			const tc4Second = item.find('.tc4').children().eq(1);
+
+			// 定义语言缩写映射
+			const langMap = {
+				'Chinese (simplified)': '官方中文',
+				'Chinese (traditional)': '官方中文',
+				'English': 'Official TL'
+
+			};
+
+			// 初始化语言列表和缩写
+			let languages = [];
+			item.find("[class*='icon-lang-']").each((index, element) => {
+			const title = $(element).attr('title');
+			const shortLang = langMap[title];
+			// 仅插入 CH 和 EN 两种语言
+			if (shortLang === '官方中文' || shortLang === 'Official TL') {
+				if (!languages.includes(shortLang)) {
+                languages.push(shortLang);
+				}
+			}
+			if (languages.length >= 2) {
+				return false; // 如果已找到 CH 和 EN，两种语言均存在，则终止循环
+			}
+			});
+
+			// 构建语言字符串
+			let languageStr = languages.join('/');
 
 			//获取VNDB Release编号
 			let rid = a.attr('href');
@@ -53,9 +80,8 @@ module.exports = async (ctx) => {
 				small = tc4Second.text();
 			}
 
-
 			// 构建 description 字符串
-			let descriptionContent = `[公式日本語] (${ridLink}) ${a.attr('title')} ${small} ${platforms}<br><br>`;
+			let descriptionContent = `[${languageStr}] (${ridLink}) ${a.attr('title')} ${small} ${platforms}<br><br>`;
 
 			if (exter.length > 0) {
 				// 如果找到 ul li a 标签，则遍历所有a标签并拼接成字符串
@@ -63,7 +89,7 @@ module.exports = async (ctx) => {
 				descriptionContent += `${$(element)}<br><br>`;
 				});
 			} else if (inter.length > 0) {
-				// 如果没有找到 ul li a 标签，但找到 .tc_links a 标签，添加到 description
+				// 如果没有找到 ul li a 标签，但找到 .tc6 a 标签，添加到 description
 				inter.each((index, element) => {
 				descriptionContent += `${$(element).attr('href')}<br><br>`;
 				});
@@ -93,9 +119,9 @@ module.exports = async (ctx) => {
     ctx.state.data = {
         // 在此处输出您的 RSS
          // 源标题
-         title: `公式日本語`,
+         title: `Official Released`,
          // 源链接
-         link: `${baseUrl}/r?q=&o=d&s=released&f=06741032hen2xzh_dHans-2xzh_dHant-N483gjaNg01bgin2gja`,
+         link: `${baseUrl}/r?q=&o=d&s=released&f=04741132gen2wzh_dHans-2wzh_dHant-Ng01bgin`,
          // 源文章
          item: item,
     };

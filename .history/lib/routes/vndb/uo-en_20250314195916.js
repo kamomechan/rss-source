@@ -8,7 +8,7 @@ module.exports = async (ctx) => {
 	const baseUrl = 'https://vndb.org';
 
 	// 注意，".data" 属性包含了请求返回的目标页面的完整 HTML 源代码
-    const { data: response } = await got(`${baseUrl}/r?q=&o=d&s=released&f=06741032hen2xzh_dHans-2xzh_dHant-N483gjaNg01bgin2gja`);
+    const { data: response } = await got(`${baseUrl}/r?q=&o=d&s=released&f=04741Ng112genNd01`);
     const $ = cheerio.load(response);
 
 
@@ -47,15 +47,9 @@ module.exports = async (ctx) => {
 				});
 			}
 
-			// 单独判断是否有.tc4类下第二个标签
-			let small = '';
-			if (tc4Second.length > 0) {
-				small = tc4Second.text();
-			}
-
 
 			// 构建 description 字符串
-			let descriptionContent = `[公式日本語] (${ridLink}) ${a.attr('title')} ${small} ${platforms}<br><br>`;
+			let descriptionContent = `[Fan TL] (${ridLink}) ${a.attr('title')} ${platforms}<br><br>`;
 
 			if (exter.length > 0) {
 				// 如果找到 ul li a 标签，则遍历所有a标签并拼接成字符串
@@ -63,7 +57,7 @@ module.exports = async (ctx) => {
 				descriptionContent += `${$(element)}<br><br>`;
 				});
 			} else if (inter.length > 0) {
-				// 如果没有找到 ul li a 标签，但找到 .tc_links a 标签，添加到 description
+				// 如果没有找到 ul li a 标签，但找到 .tc6 a 标签，添加到 description
 				inter.each((index, element) => {
 				descriptionContent += `${$(element).attr('href')}<br><br>`;
 				});
@@ -93,9 +87,9 @@ module.exports = async (ctx) => {
     ctx.state.data = {
         // 在此处输出您的 RSS
          // 源标题
-         title: `公式日本語`,
+         title: `Fan TL Released`,
          // 源链接
-         link: `${baseUrl}/r?q=&o=d&s=released&f=06741032hen2xzh_dHans-2xzh_dHant-N483gjaNg01bgin2gja`,
+         link: `${baseUrl}/r?q=&o=d&s=released&f=04741Ng112genNd01`,
          // 源文章
          item: item,
     };

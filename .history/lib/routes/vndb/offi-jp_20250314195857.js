@@ -63,7 +63,7 @@ module.exports = async (ctx) => {
 				descriptionContent += `${$(element)}<br><br>`;
 				});
 			} else if (inter.length > 0) {
-				// 如果没有找到 ul li a 标签，但找到 .tc_links a 标签，添加到 description
+				// 如果没有找到 ul li a 标签，但找到 .tc6 a 标签，添加到 description
 				inter.each((index, element) => {
 				descriptionContent += `${$(element).attr('href')}<br><br>`;
 				});
